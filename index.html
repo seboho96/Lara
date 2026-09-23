@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cuenta regresiva para la Lara pelotuda 🎂</title>
+<style>
+  :root{
+    --bg1:#2b1055;
+    --bg2:#7597de;
+    --card:#ffffffee;
+    --accent:#ff5da2;
+    --accent2:#ffb703;
+    --text:#2b1055;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --card:#1f1b3aee;
+      --text:#ffffff;
+    }
+  }
+  :root[data-theme="dark"]{
+    --card:#1f1b3aee;
+    --text:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    height:100%;
+    margin:0;
+  }
+  body{
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    padding-top:calc(24px + env(safe-area-inset-top,0px));
+    padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));
+    overflow-x:hidden;
+    position:relative;
+  }
+  .card{
+    background:var(--card);
+    color:var(--text);
+    border-radius:24px;
+    padding:40px 32px;
+    max-width:480px;
+    width:100%;
+    text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+    position:relative;
+    z-index:2;
+  }
+  h1{
+    font-size:1.6rem;
+    margin:0 0 6px;
+  }
+  .name{
+    font-size:2.2rem;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    font-weight:800;
+    margin:0 0 20px;
+  }
+  .timer{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin:20px 0;
+  }
+  .unit{
+    background:linear-gradient(160deg,var(--accent),var(--accent2));
+    color:#fff;
+    border-radius:14px;
+    padding:14px 10px;
+    min-width:72px;
+  }
+  .unit .num{
+    font-size:2rem;
+    font-weight:800;
+    font-variant-numeric: tabular-nums;
+  }
+  .unit .label{
+    font-size:.7rem;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    opacity:.9;
+  }
+  .msg{
+    margin-top:18px;
+    font-size:1rem;
+    opacity:.85;
+  }
+  .celebrate{
+    display:none;
+  }
+  .celebrate.show{
+    display:block;
+  }
+  .celebrate h2{
+    font-size:1.8rem;
+    margin:10px 0;
+  }
+  .confetti{
+    position:fixed;
+    top:-10px;
+    width:8px;
+    height:14px;
+    opacity:0.9;
+    z-index:1;
+    animation: fall linear forwards;
+  }
+  @keyframes fall{
+    to{ transform: translateY(110vh) rotate(360deg); opacity:0.3; }
+  }
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div id="pre">
+      <h1>Falta para el cumple de la</h1>
+      <div class="name">Lara pelotuda 🎉</div>
+      <div class="timer">
+        <div class="unit"><div class="num" id="hh">00</div><div class="label">h</div></div>
+        <div class="unit"><div class="num" id="mm">00</div><div class="label">min</div></div>
+        <div class="unit"><div class="num" id="ss">00</div><div class="label">s</div></div>
+      </div>
+      <div class="msg">🕛 Pelotuda pero me gustás mucho</div>
+    </div>
+
+    <div id="celebrate" class="celebrate">
+      <h2>🎂🥳 ¡Feliz cumple, Lara pelotuda! 🥳🎂</h2>
+      <p class="msg">Ya es medianoche... ¡llegó su día! 🎈</p>
+    </div>
+  </div>
+
+<script>
+(function(){
+  function getTarget(){
+    const now = new Date();
+    const target = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0,0,0,0);
+    return target;
+  }
+
+  const target = getTarget();
+  const hhEl = document.getElementById('hh');
+  const mmEl = document.getElementById('mm');
+  const ssEl = document.getElementById('ss');
+  const pre = document.getElementById('pre');
+  const celebrate = document.getElementById('celebrate');
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  let confettiStarted = false;
+  function launchConfetti(){
+    if(confettiStarted) return;
+    confettiStarted = true;
+    const colors = ['#ff5da2','#ffb703','#8ecae6','#a663cc','#43aa8b'];
+    for(let i=0;i<80;i++){
+      setTimeout(()=>{
+        const c = document.createElement('div');
+        c.className='confetti';
+        c.style.left = Math.random()*100+'vw';
+        c.style.background = colors[Math.floor(Math.random()*colors.length)];
+        c.style.animationDuration = (2.5+Math.random()*2.5)+'s';
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(), 6000);
+      }, i*60);
+    }
+  }
+
+  function tick(){
+    const now = new Date();
+    const diff = target - now;
+    if(diff <= 0){
+      pre.style.display='none';
+      celebrate.classList.add('show');
+      launchConfetti();
+      clearInterval(timer);
+      return;
+    }
+    const totalSeconds = Math.floor(diff/1000);
+    const h = Math.floor(totalSeconds/3600);
+    const m = Math.floor((totalSeconds%3600)/60);
+    const s = totalSeconds%60;
+    hhEl.textContent = pad(h);
+    mmEl.textContent = pad(m);
+    ssEl.textContent = pad(s);
+  }
+
+  tick();
+  const timer = setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>
